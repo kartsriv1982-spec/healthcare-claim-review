@@ -20,7 +20,7 @@ def store_documents(
     vectors = embeddings.embed_documents(
         texts
     )
-
+   
     collection.add(
         ids=[
             str(uuid.uuid4())
