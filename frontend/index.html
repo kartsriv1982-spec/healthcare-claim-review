@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My S3 Hosted Website</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #232f3e; /* AWS Dark Navy color */
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+        }
+        p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #ff9900; /* AWS Orange color */
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #ec7211;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Hello, World!</h1>
+        <p>Success! Your static website is officially live and hosting directly out of your secure Amazon S3 bucket.</p>
+        <button class="btn" onclick="celebrate()">Click Me!</button>
+        <div class="footer">Hosted on AWS S3</div>
+    </div>
+
+    <script>
+        function celebrate() {
+            alert('🎉 Congratulations! Your AWS S3 website works perfectly!');
+        }
+    </script>
+
+</body>
+</html>
