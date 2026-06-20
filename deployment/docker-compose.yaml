@@ -11,6 +11,23 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  auth-service:
+
+    build:
+      context: ./authservice
+
+    container_name: healthcare-auth
+
+    ports:
+      - "8081:8081"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_claims
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin123
+
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:

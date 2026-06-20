@@ -1,0 +1,48 @@
+server:
+  port: 8081
+
+spring:
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/healthcare_claims
+    username: admin
+    password: admin123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: healthcare-claim-review-secret-key-2026
+
+
+
+
+#server:
+#  port: 8083
+#
+#spring:
+#  application:
+#    name: auth-service
+#
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,prometheus
+#
+#springdoc:
+#  api-docs:
+#    enabled: true
