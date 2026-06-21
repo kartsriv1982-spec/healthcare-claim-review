@@ -17,13 +17,9 @@ from storage import store_documents
 
 from evaluate import evaluate_query
 
-from config.loadConfig import (OPENAI_API_KEY,OPENAI_EMBEDDING_MODEL,
-    COVERAGE_RAG_PATH,
-    COVERAGE_DOC_PATH,
-    CLAIMS_HISTORY_RAG_PATH
-)
+from config.loadConfig import (COVERAGE_RAG_PATH,COVERAGE_DOC_PATH)
 
-from embeddings.embedding_provider import (get_embedding_model)
+from embeddings.embeddingProvider import (get_embedding_model)
 from policyChunker import (policy_coverage_chunking)
 
 def load_pdf_document(file_path):
@@ -103,6 +99,66 @@ def ingest():
         "status": "Ingestion Completed"
            }
 
+def query(question,
+          plan_name =None,
+          rule_type = None,
+          top_k=5):
+    embeddings = get_embedding_model()
+
+    # Query Coverage 
+
+    client = chromadb.PersistentClient(
+        path=COVERAGE_RAG_PATH
+    )
+    
+    coverage_collection = (
+            client.get_collection(
+                "COVERAGE_COLLECTION"
+            )
+        )   
+    
+    query_embedding = (
+        embeddings.embed_query(
+            question
+        )
+    )
+
+    where_clause = []
+
+    if plan_name:
+        where_clause.append({"plan_name": plan_name})
+        
+
+    if rule_type:
+        where_clause.append({"rule_type": rule_type})
+        
+    
+    if where_clause:
+
+        results = coverage_collection.query(
+
+            query_embeddings=[
+                query_embedding
+            ],
+
+            where={"$and": where_clause},
+
+            n_results=top_k
+        )
+
+    else:
+
+        results = coverage_collection.query(
+
+            query_embeddings=[
+                query_embedding
+            ],
+
+            n_results=top_k
+        )
+
+    return results["documents"]
+    
     
 
 ## if __name__ == "__main__":

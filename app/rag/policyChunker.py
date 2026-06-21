@@ -89,8 +89,7 @@ def policy_coverage_chunking(
                 page_content=coverage,
                 metadata={
                     "plan_name": plan_name,
-                    "rule_type": "coverage",
-                    "section": "covered_expenses"
+                    "rule_type": "coverage"
                 }
             )
         )
@@ -115,9 +114,7 @@ def policy_coverage_chunking(
                     page_content=exclusion,
                     metadata={
                         "plan_name": plan_name,
-                        "rule_type": "exclusion",
-                        "section": "exclusions",
-                        "exclusion": exclusion
+                        "rule_type": "exclusion"
                     }
                 )
             )    
@@ -167,11 +164,7 @@ def policy_coverage_chunking(
                     metadata={
                         "plan_name": plan_name,
                         "rule_type":
-                            "waiting_period",
-                        "condition":
-                            condition,
-                        "months":
-                            months
+                            "waiting_period"
                     }
                 )
             )             
@@ -205,9 +198,7 @@ def policy_coverage_chunking(
                 metadata={
                     "plan_name": plan_name,
                     "rule_type":
-                        "human_review",
-                    "threshold":
-                        threshold
+                        "human_review_threshold"
                 }
             )
         )
@@ -215,17 +206,26 @@ def policy_coverage_chunking(
     
     plan_summary = extract_plan_summary(text)
 
-    if plan_summary:
+    plan_summary_items = [
+
+    line.strip()
+
+    for line in plan_summary.split("\n")
+
+    if line.strip()
+]
+    for item in plan_summary_items:
 
         chunks.append( Document(
-            page_content=plan_summary,
+            page_content=item,
             metadata={
                 "plan_name": plan_name,
-                "rule_type": "plan_summary",
-                "section": "plan_summary"
+                "rule_type": "plan_summary"
             }
         )
-    )    
+    )
+
+
     return chunks
         
 

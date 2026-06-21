@@ -85,6 +85,7 @@ def section_chunking(documents):
         )
 
     return result
+    
 
 
 CHUNKING_STRATEGIES = {
