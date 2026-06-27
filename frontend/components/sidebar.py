@@ -1,19 +1,21 @@
 import streamlit as st
 
-
 def render_sidebar():
 
     with st.sidebar:
 
-        st.write(
-            f"Welcome "
-            f"{st.session_state.get('username','User')}"
+        st.success(
+            f"👤 {st.session_state.get('username')}"
         )
 
+        st.divider()
+
         if st.button(
-                "Logout",
-                key="logout_button"):
+                "🚪 Logout",
+                use_container_width=True):
 
             st.session_state.clear()
 
-            st.rerun()
+            st.switch_page(
+                "pages/login.py"
+            )

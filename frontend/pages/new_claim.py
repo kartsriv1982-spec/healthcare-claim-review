@@ -8,11 +8,7 @@ if not st.session_state.get(
         "authenticated",
         False):
 
-    st.error(
-        "Please login first"
-    )
-
-    st.stop()
+    st.switch_page("pages/login.py")
 
 from services.claim_service import upload_claim
 

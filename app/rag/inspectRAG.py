@@ -1,7 +1,7 @@
 import chromadb
 
-from config.loadConfig import (
-    COVERAGE_RAG_PATH
+from .config.loadConfig import (
+    COVERAGE_RAG_PATH,
 )
 
 client = chromadb.PersistentClient(

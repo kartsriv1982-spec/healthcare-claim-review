@@ -1,164 +1,564 @@
+
 import streamlit as st
+import requests
+# ==================================================
+# Authentication Check
+# ==================================================
 
-from components.sidebar import render_sidebar
+if not st.session_state.get("authenticated", False):
+    st.switch_page("pages/login.py")
 
-render_sidebar()
+# ==================================================
+# Configuration
+# ==================================================
 
-if not st.session_state.get(
-        "authenticated",
-        False):
+API_BASE_URL = "http://localhost:8000/api/v1"
 
-    st.error(
-        "Please login first"
-    )
+# ==================================================
+# Page Setup
+# ==================================================
 
-    st.stop()
-
-from services.claim_service import (
-    get_claim_review,
-    submit_decision
+st.set_page_config(
+    page_title="Claim Review",
+    page_icon="🔍",
+    layout="wide"
 )
 
-st.title("🔍 Claim Review")
+st.title("🔍 Human-in-the-Loop Claim Review")
 
-# ------------------------------------
+# ==================================================
+# Session Initialization
+# ==================================================
+
+if "claim_data" not in st.session_state:
+    st.session_state["claim_data"] = None
+
+if "review_result" not in st.session_state:
+    st.session_state["review_result"] = None
+
+if "submission_success" not in st.session_state:
+    st.session_state["submission_success"] = None
+
+if "submission_error" not in st.session_state:
+    st.session_state["submission_error"] = None
+
+
+# ==================================================
+# Success / Error Messages
+# ==================================================
+
+if st.session_state["submission_success"]:
+
+    st.toast(
+        st.session_state["submission_success"],
+        icon="✅"
+    )
+
+    st.session_state["submission_success"] = None
+
+if st.session_state["submission_error"]:
+
+    st.toast(
+        st.session_state["submission_error"],
+        icon="❌"
+    )
+
+    st.session_state["submission_error"] = None
+
+
+
+# ==================================================
 # Claim Selection
-# ------------------------------------
+# ==================================================
 
 claim_id = st.text_input(
     "Claim ID",
     value="CLM-1001"
 )
 
-try:
+# ==================================================
+# Load Claim
+# ==================================================
 
-    data = get_claim_review(claim_id)
+col1, col2 = st.columns([2, 1])
 
-    col1, col2, col3 = st.columns(3)
+with col1:
 
-    # ------------------------------------
-    # Extracted Claim Data
-    # ------------------------------------
+    if st.button(
+        "📂 Load Claim",
+        use_container_width=True
+    ):
 
-    with col1:
+        try:
 
-        st.subheader("Extracted Data")
+            response = requests.get(
+                f"{API_BASE_URL}/claims/{claim_id}/review"
+            )
 
-        # Mock values for Sprint-2
-        st.text("Patient ID : P12345")
-        st.text("Patient : John Doe")
-        st.text("Hospital : City Hospital")
-        st.text("Amount : $1200")
+            response.raise_for_status()
 
-    # ------------------------------------
-    # Policy Context
-    # ------------------------------------
+            st.session_state["claim_data"] = (
+                response.json()
+            )
 
-    with col2:
+            st.session_state["review_result"] = None
 
-        st.subheader("Policy Context")
+            st.success(
+                "Claim Loaded Successfully"
+            )
 
-        st.info("""
-Policy Section 4.2
+        except Exception as ex:
 
-Coverage Limit : $5000
+            st.error(
+                f"Failed to load claim: {str(ex)}"
+            )
 
-Patient Eligible
-""")
+with col2:
 
-    # ------------------------------------
-    # AI Recommendation
-    # ------------------------------------
+    if st.button(
+        "🔄 Reset",
+        use_container_width=True
+    ):
 
-    with col3:
+        st.session_state["claim_data"] = None
+        st.session_state["review_result"] = None
 
-        st.subheader("AI Recommendation")
+        st.rerun()
 
-        decision = data.get(
-            "recommendation",
-            "UNKNOWN"
-        )
+# ==================================================
+# Claim Information
+# ==================================================
 
-        confidence = data.get(
-            "confidence",
-            0
-        )
+if st.session_state["claim_data"]:
 
-        if decision == "APPROVE":
-
-            st.success(decision)
-
-        elif decision == "REJECT":
-
-            st.error(decision)
-
-        else:
-
-            st.warning(decision)
-
-        st.metric(
-            "Confidence",
-            f"{confidence}%"
-        )
+    claim = st.session_state["claim_data"]
 
     st.divider()
 
-    # ------------------------------------
-    # Human Review Notes
-    # ------------------------------------
+    st.subheader("📋 Claim Information")
 
-    notes = st.text_area(
-        "Adjuster Notes"
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.write(
+            f"**Claim ID:** "
+            f"{claim.get('claim_id')}"
+        )
+
+        st.write(
+            f"**Status:** "
+            f"{claim.get('status')}"
+        )
+
+    with col2:
+
+        status = claim.get("status", "")
+
+        if status == "OCR_COMPLETED":
+
+            st.success("✅ OCR Completed")
+
+        elif status == "PROCESSING":
+
+            st.warning("⏳ OCR Pending")
+
+        elif status == "PENDING_HUMAN_REVIEW":
+
+            st.success("✅ AI Review Completed")
+
+        elif status == "APPROVED":
+
+            st.success("✅ Claim Approved")
+
+        elif status == "REJECTED":
+
+            st.error("❌ Claim Rejected")
+
+        elif status == "REQUEST_INFO":
+
+            st.warning("📄 Additional Information Requested")
+
+        else:
+
+            st.info(status)
+
+# ==================================================
+# OCR Output
+# ==================================================
+
+if st.session_state["claim_data"]:
+
+    claim = st.session_state["claim_data"]
+
+    st.divider()
+
+    st.subheader("📄 OCR Extracted Text")
+
+    st.text_area(
+        label="OCR Output",
+        value=claim.get(
+            "ocr_text",
+            "No OCR text available"
+        ),
+        height=250,
+        disabled=True
     )
 
-    col4, col5 = st.columns(2)
+# ==================================================
+# AI Review Trigger
+# ==================================================
 
-    # ------------------------------------
-    # Approve Claim
-    # ------------------------------------
+claim_data = st.session_state["claim_data"]
 
-    with col4:
+if (
+    claim_data
+    and not st.session_state["review_result"]
+    and claim_data.get("status") not in [
+        "APPROVED",
+        "REJECTED",
+        "REQUEST_INFO"
+    ]
+):
+    st.divider()
 
-        if st.button(
-            "Approve Claim",
-            key="approve_claim_btn",
-            width="stretch"
-        ):
+    if st.button(
+        "🚀 Start AI Review",
+        use_container_width=True
+    ):
 
-            result = submit_decision(
-                claim_id=claim_id,
-                decision="APPROVE",
-                comments=notes
+        try:
+
+        # --------------------------------------
+        # Step 1 : OCR Extraction
+        # --------------------------------------
+
+            with st.spinner("Running OCR Extraction..."):
+
+                ocr_response = requests.post(
+                    f"{API_BASE_URL}/claims/{claim_id}/extract"
+                )
+
+                ocr_response.raise_for_status()
+
+                # Refresh claim data so OCR text appears immediately
+                claim_response = requests.get(
+                    f"{API_BASE_URL}/claims/{claim_id}/review"
+                )
+
+                claim_response.raise_for_status()
+
+                st.session_state["claim_data"] = claim_response.json()
+
+            # --------------------------------------
+            # Step 2 : AI Review
+            # --------------------------------------
+
+            with st.spinner("Running AI Review..."):
+
+                    review_response = requests.post(
+                        f"{API_BASE_URL}/claims/{claim_id}/review"
+                    )
+
+                    review_response.raise_for_status()
+
+                    result = review_response.json()
+
+                    # ------------------------------------------
+                    # Validation Failed
+                    # ------------------------------------------
+
+                    if not result.get("validation_status", True):
+
+                        st.session_state["review_result"] = result
+
+                    else:
+
+                        st.session_state["review_result"] = result
+
+            st.rerun()
+
+        except Exception as ex:
+
+            st.error(f"Review Failed: {str(ex)}")
+
+# ==================================================
+# Validation Failure
+# ==================================================
+
+if (
+
+    st.session_state["review_result"]
+
+    and
+
+    not st.session_state["review_result"].get(
+        "validation_status",
+        True
+    )
+
+):
+
+    result = st.session_state["review_result"]
+
+    st.divider()
+
+    st.error("❌ Validation Failed")
+
+    st.warning(result.get("message"))
+
+    st.subheader("Missing Mandatory Fields")
+
+    for field in result.get("missing_fields", []):
+
+        st.write(f"• {field}")
+
+# ==================================================
+# AI Recommendation
+# ==================================================
+
+
+
+if (
+
+    st.session_state["review_result"]
+
+    and
+
+    st.session_state["review_result"].get(
+        "validation_status",
+        True
+    )
+
+):
+
+    result = st.session_state["review_result"]
+
+    st.divider()
+
+    st.subheader(
+        "🤖 AI Recommendation"
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+            "Recommendation",
+            result.get(
+                "recommendation",
+                "N/A"
+            )
+        )
+
+    with col2:
+
+        st.metric(
+            "Confidence",
+            f"{result.get('confidence',0)}%"
+        )
+
+    st.info(
+        result.get(
+            "summary",
+            "No summary available"
+        )
+    )
+
+    findings = result.get(
+        "findings",
+        []
+    )
+
+    if findings:
+
+        st.subheader("🔎 Findings")
+
+        for finding in findings:
+
+            st.write(
+                f"✅ {finding}"
             )
 
-            st.success(
-                f"Claim {result['decision']} successfully"
+# ==================================================
+# Human Review Section
+# ==================================================
+
+if (
+
+    st.session_state["review_result"]
+
+    and
+
+    st.session_state["review_result"].get(
+        "validation_status",
+        True
+    )
+
+    and
+
+    st.session_state["claim_data"]["status"]
+
+    not in [
+
+        "APPROVED",
+
+        "REJECTED",
+
+        "REQUEST_INFO"
+
+    ]
+
+):
+    st.divider()
+
+    st.subheader(
+        "👨 Human Review"
+    )
+
+    # AI recommendation from review result
+    ai_recommendation = st.session_state["review_result"].get(
+        "recommendation",
+        "APPROVE"
+    )
+
+    options = [
+        "APPROVE",
+        "REJECT",
+        "REQUEST_INFO"
+    ]
+    st.info(
+        f"🤖 AI Recommendation: {ai_recommendation}"
+    )
+    decision = st.radio(
+        "Reviewer Decision",
+        options,
+        index=options.index(ai_recommendation)
+            if ai_recommendation in options
+            else 0,
+        horizontal=True
+    )
+
+    comments = st.text_area(
+            "Reviewer Comments"
+    )
+
+    reviewer = st.text_input(
+        "Reviewer Name",
+        value=st.session_state.get(
+            "username",
+            "Reviewer"
+        )
+    )
+
+    if st.button(
+        "✅ Submit Decision",
+        use_container_width=True
+    ):
+
+        payload = {
+
+            "decision":
+                decision,
+
+            "comments":
+                comments,
+
+            "reviewed_by":
+                reviewer
+        }
+
+        try:
+
+            response = requests.post(
+                f"{API_BASE_URL}/claims/{claim_id}/human-review",
+                json=payload
             )
 
-    # ------------------------------------
-    # Reject Claim
-    # ------------------------------------
+            response.raise_for_status()
 
-    with col5:
+            st.session_state["submission_success"] = (
+                        f"Decision '{decision}' submitted successfully by {reviewer}."
+)
 
-        if st.button(
-            "Reject Claim",
-            key="reject_claim_btn",
-            width="stretch"
-        ):
+            # Return page to pre-review state
 
-            result = submit_decision(
-                claim_id=claim_id,
-                decision="REJECT",
-                comments=notes
+            st.session_state[
+                "review_result"
+            ] = None
+
+            claim_response = requests.get(
+                f"{API_BASE_URL}/claims/{claim_id}/review"
             )
+
+            claim_response.raise_for_status()
+
+            st.session_state["claim_data"] = claim_response.json()
+
+            st.session_state["review_result"] = None
+
+
+            st.rerun()
+
+        except Exception as ex:
+
+            st.session_state["submission_error"] = (
+            f"Submission Failed: {str(ex)}"
+            )
+
+            st.rerun()
+
+# ==================================================
+# Audit Information
+# ==================================================
+
+if st.session_state["claim_data"]:
+
+    st.divider()
+
+    st.subheader("📋 Audit Information")
+
+    st.write(
+        f"**Reviewer:** "
+        f"{st.session_state.get('username', 'N/A')}"
+    )
+
+    st.write(
+        f"**Claim ID:** "
+        f"{claim_id}"
+    )
+
+    with st.expander("🔍 View Complete Audit Trail"):
+
+        try:
+
+            response = requests.get(
+                f"{API_BASE_URL}/claims/{claim_id}/audit"
+            )
+
+            response.raise_for_status()
+
+            audit_logs = response.json()
+
+            for log in audit_logs:
+
+                st.markdown(
+                    f"""
+**Stage:** {log["stage"]}
+
+**Actor:** {log["actor"]}
+
+**Action:** {log["action"]}
+
+**Time:** {log["created_date"]}
+
+---
+"""
+                )
+
+        except Exception as ex:
 
             st.error(
-                f"Claim {result['decision']} successfully"
+                f"Unable to load audit trail: {str(ex)}"
             )
-
-except Exception as e:
-
-    st.error(
-        f"Unable to load claim review data.\n\n{str(e)}"
-    )

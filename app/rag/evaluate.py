@@ -1,4 +1,4 @@
-from retrieval import query_collection
+from .retrieval import query_collection
 
 
 def evaluate_query(

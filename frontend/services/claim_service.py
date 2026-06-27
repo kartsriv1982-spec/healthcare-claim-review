@@ -66,3 +66,24 @@ def submit_decision(
     response.raise_for_status()
 
     return response.json()
+
+def extract_claim(claim_id):
+
+    response = requests.post(
+        f"{BASE_URL}/claims/{claim_id}/extract"
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+
+def start_ai_review(claim_id):
+
+    response = requests.post(
+        f"{BASE_URL}/claims/{claim_id}/review"
+    )
+
+    response.raise_for_status()
+
+    return response.json()

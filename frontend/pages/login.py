@@ -1,47 +1,88 @@
 import streamlit as st
-
 from services.auth_service import login
 
-st.title("Healthcare Claim Review")
-
-st.subheader("Login")
-
-username = st.text_input(
-    "Username"
+st.set_page_config(
+    page_title="Login",
+    page_icon="🔐",
+    layout="centered"
 )
 
-password = st.text_input(
-    "Password",
-    type="password"
-)
+# Already logged in?
+if st.session_state.get("authenticated"):
+    st.switch_page("app.py")
 
-if st.button(
-        "Login",
-        key="login_button"):
+# Center card
+col1, col2, col3 = st.columns([1, 2, 1])
 
-    try:
+with col2:
 
-        result = login(
-            username,
-            password
-        )
+    st.markdown(
+        """
+        <div style='text-align:center'>
+            <h1>🏥</h1>
+            <h2>Healthcare Claim Review</h2>
+            <p>AI Powered Claim Processing Platform</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        st.session_state["jwt"] = (
-            result["token"]
-        )
+    st.divider()
 
-        st.session_state["authenticated"] = True
+    username = st.text_input(
+        "Username",
+        placeholder="Enter username"
+    )
 
-        st.session_state["username"] = (
-            username
-        )
+    password = st.text_input(
+        "Password",
+        type="password",
+        placeholder="Enter password"
+    )
 
-        st.success(
-            "Login Successful"
-        )
+    if st.button(
+        "🔐 Login",
+        use_container_width=True,
+        key="login_btn"
+    ):
 
-    except Exception as ex:
+        if not username or not password:
 
-        st.error(
-            f"Login Failed : {str(ex)}"
-        )
+            st.warning(
+                "Username and Password are required"
+            )
+
+        else:
+
+            try:
+
+                result = login(
+                    username,
+                    password
+                )
+
+                st.session_state["jwt"] = (
+                    result["token"]
+                )
+
+                st.session_state["authenticated"] = True
+
+                st.session_state["username"] = username
+
+                st.success(
+                    "Login Successful"
+                )
+
+                st.switch_page("app.py")
+
+            except Exception as ex:
+
+                st.error(
+                    "Invalid username or password"
+                )
+
+    st.divider()
+
+    st.caption(
+        "Healthcare Insurance Claim Review System v1.0"
+    )

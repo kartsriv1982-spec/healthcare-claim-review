@@ -1,12 +1,11 @@
 import streamlit as st
-
 st.set_page_config(
     page_title="Healthcare Claim Review",
     page_icon="🏥",
     layout="wide"
 )
 
-# Initialize session variables
+# Initialize session
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 
@@ -14,7 +13,6 @@ if "authenticated" not in st.session_state:
 if not st.session_state["authenticated"]:
     st.switch_page("pages/login.py")
 
-# Main Application Home Page
 st.title("🏥 Healthcare Insurance Claim Review Assistant")
 
 st.success(
@@ -22,14 +20,11 @@ st.success(
 )
 
 st.markdown("""
-### AI-Powered Healthcare Claim Review Platform
+### AI Powered Healthcare Claim Review Platform
 
-This platform provides:
-
-- 📄 Claim Document Upload
+- 📄 Claim Upload
 - 🔍 OCR Extraction (Amazon Textract)
-- ✅ Claim Validation
-- 🤖 AI-Powered Claim Review
+- 🤖 AI Claim Review
 - 📊 Dashboard & Reporting
 - 🔐 Secure Authentication
 

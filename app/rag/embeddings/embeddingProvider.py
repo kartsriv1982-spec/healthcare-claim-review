@@ -1,7 +1,7 @@
 from langchain_openai import OpenAIEmbeddings
 
-from config.loadConfig import (OPENAI_EMBEDDING_MODEL)
-from config.loadSecrets import (OPENAI_API_KEY)
+from ..config.loadConfig import (OPENAI_EMBEDDING_MODEL)
+from ..config.loadSecrets import (OPENAI_API_KEY)
 
 
 def get_embedding_model():

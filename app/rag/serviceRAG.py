@@ -1,10 +1,15 @@
 from fastapi import FastAPI  
 
-from RAG import (ingest,query)
+from .RAG import (ingest, query)
 
-from config.loadConfig import (RAG_INGEST_API_PATH, RAG_HEALTH_API_PATH,RAG_INSPECT_API_PATH,RAG_QUERY_API_PATH)
+from .config.loadConfig import (
+    RAG_INGEST_API_PATH,
+    RAG_HEALTH_API_PATH,
+    RAG_INSPECT_API_PATH,
+    RAG_QUERY_API_PATH,
+)
 
-from inspectRAG import inspect
+from .inspectRAG import inspect
 
 from pydantic import BaseModel
 
@@ -53,7 +58,4 @@ def query_API(request: query_request):
 
     results = query(request.question, request.plan_name, request.rule_type, request.top_k)
 
-    return {
-        "status": "Query Completed",
-        "result": results
-    }
+    return results

@@ -1,5 +1,6 @@
 from xmlrpc import client
-
+from .prompt import build_rag_prompt
+from .llm import generate_answer
 import chromadb
 
 from langchain_community.document_loaders import (
@@ -9,18 +10,18 @@ from langchain_community.document_loaders import (
 import os
 from langchain_openai import OpenAIEmbeddings
 
-from chunkers import (
+from .chunkers import (
     CHUNKING_STRATEGIES
 )
 
-from storage import store_documents
+from .storage import store_documents
 
-from evaluate import evaluate_query
+from .evaluate import evaluate_query
 
-from config.loadConfig import (COVERAGE_RAG_PATH,COVERAGE_DOC_PATH)
+from .config.loadConfig import (COVERAGE_RAG_PATH, COVERAGE_DOC_PATH)
 
-from embeddings.embeddingProvider import (get_embedding_model)
-from policyChunker import (policy_coverage_chunking)
+from .embeddings.embeddingProvider import (get_embedding_model)
+from .policyChunker import (policy_coverage_chunking)
 
 def load_pdf_document(file_path):
     loader = PyPDFLoader(file_path)
@@ -157,7 +158,60 @@ def query(question,
             n_results=top_k
         )
 
-    return results["documents"]
+    documents = results["documents"][0]
+
+    context = "\n\n".join(documents)
+
+    prompt = build_rag_prompt(
+        question,
+        context
+    )
+    
+    answer = generate_answer(
+        prompt
+    )
+
+    answer = generate_answer(prompt)
+
+    # ==================================================
+    # Validate LLM Response
+    # ==================================================
+
+    required_fields = [
+
+        "coverage_decision",
+
+        "confidence_score",
+
+        "reasoning",
+
+        "policy_clause",
+
+        "matched_section",
+
+        "medical_necessity",
+
+        "exclusion"
+    ]
+
+    for field in required_fields:
+
+        if field not in answer:
+
+            raise Exception(
+                f"LLM response missing field: {field}"
+            )
+
+    # ==================================================
+    # Add RAG Metadata
+    # ==================================================
+
+    answer["retrieved_chunks"] = documents
+
+    answer["question"] = question
+
+    return answer
+
     
     
 

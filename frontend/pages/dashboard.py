@@ -8,11 +8,8 @@ if not st.session_state.get(
         "authenticated",
         False):
 
-    st.error(
-        "Please login first"
-    )
+    st.switch_page("pages/login.py")
 
-    st.stop()
 
 st.title("📊 Dashboard")
 
