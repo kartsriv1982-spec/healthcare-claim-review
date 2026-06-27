@@ -5,6 +5,7 @@ import json
 
 from datasetLoader import DatasetLoader
 from evaluator import Evaluator
+from reportGenerator import ReportGenerator
 
 
 class EvaluationRunner:
@@ -85,6 +86,16 @@ class EvaluationRunner:
             evaluations.append(
                 evaluation
             )
+        # -------------------------------
+    # Generate Reports
+    # -------------------------------
+
+        report_generator = ReportGenerator()
+
+        report_generator.generate_excel(evaluations)
+
+        report_generator.generate_html(evaluations)
+    
 
         return evaluations
 
