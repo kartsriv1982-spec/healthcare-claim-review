@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 
 from app.api import auth
@@ -5,6 +7,15 @@ from app.api import claims
 from app.api import dashboard
 from app.database.db import engine
 from app.database.models import Base
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+print("=" * 60)
+print("Environment Test")
+print("TEST_ENV =", os.getenv("TEST_ENV"))
+print("=" * 60)
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(

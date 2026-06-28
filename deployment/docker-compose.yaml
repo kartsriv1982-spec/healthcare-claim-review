@@ -11,21 +11,42 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  auth-service:
 
+  auth-service:
     build:
       context: ./authservice
-
     container_name: healthcare-auth
-
     ports:
       - "8081:8081"
-
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_claims
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin123
+    depends_on:
+      - postgres
 
+  rag-service:
+    build:
+      context: ..
+      dockerfile: app/rag/Dockerfile
+    container_name: healthcare-rag
+    ports:
+      - "8002:8001"
+    env_file:
+      - ../.env
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      COVERAGE_RAG_PATH: /app/app/rag/COVERAGE_RAG_DB
+      COVERAGE_DOC_PATH: /app/app/rag/CoverageDocs
+      CLAIMS_HISTORY_RAG_PATH: /app/app/rag/CLAIMS_HISTORY_RAG_DB
+      RAG_INGEST_API_PATH: /RAG/ingest
+      RAG_QUERY_API_PATH: /RAG/query
+      RAG_HEALTH_API_PATH: /RAG/health
+      RAG_INSPECT_API_PATH: /RAG/inspect
+    volumes:
+      - ../app/rag/COVERAGE_RAG_DB:/app/app/rag/COVERAGE_RAG_DB
+      - ../app/rag/CoverageDocs:/app/app/rag/CoverageDocs
     depends_on:
       - postgres
 

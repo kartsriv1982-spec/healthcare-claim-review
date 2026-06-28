@@ -1,7 +1,9 @@
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-load_dotenv()
+CONFIG_DIR = Path(__file__).resolve().parent
+load_dotenv(CONFIG_DIR / ".env")
 
 OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL")
 COVERAGE_RAG_PATH = os.getenv("COVERAGE_RAG_PATH")

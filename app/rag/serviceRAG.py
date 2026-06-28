@@ -1,6 +1,6 @@
-from fastapi import FastAPI  
+from fastapi import FastAPI, HTTPException
 
-from .RAG import (ingest, query)
+from .RAG import ingest, query
 
 from .config.loadConfig import (
     RAG_INGEST_API_PATH,
@@ -29,18 +29,20 @@ class query_request(
 app = FastAPI(
     title="Insurance Claims RAG Ingestion API"
 )
+
 @app.post(RAG_INGEST_API_PATH)
 def ingest_API():
-
-    result = ingest()
-
-    return result
+    try:
+        result = ingest()
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 @app.get(RAG_HEALTH_API_PATH)
 def health_API():
-
     return {
-        "status": "UP"
+        "status": "UP",
+        "message": "RAG service is running. Set OPENAI_API_KEY to enable ingest and query endpoints."
     }
 
 @app.post(RAG_INSPECT_API_PATH)
@@ -55,7 +57,8 @@ def inspect_API():
 
 @app.post(RAG_QUERY_API_PATH)
 def query_API(request: query_request):
-
-    results = query(request.question, request.plan_name, request.rule_type, request.top_k)
-
-    return results
+    try:
+        results = query(request.question, request.plan_name, request.rule_type, request.top_k)
+        return results
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
