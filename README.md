@@ -15,6 +15,15 @@ This capstone project was successfully completed through the collaborative effor
 
 <img width="750" height="724" alt="image" src="https://github.com/user-attachments/assets/cf956f06-aa3c-4c28-ac37-52f3502149c2" />
 
+## 👥 Team Contributions
+
+| **Team Member**         | **Responsibilities**                                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Devashis Ghosh**      | • Policy Knowledge Base Preparation<br>• Documentation<br>• Functional Validation<br>• Complete RAG Solution Implementation<br>• Evaluation Module Development<br>• Business Solution Document Creation                                                                                                                                          |
+| **Kartikey Srivastava** | • System Design<br>• FastAPI Backend Development<br>• RAG Integration<br>• Human-in-the-Loop (HITL) Workflow Implementation<br>• PostgreSQL Integration • AWS Integration (S3 & Textract)<br>• Dockerization & Deployment Architecture <br>• UI/UX Design |
+| **Sahil Wadhwa**        | • LangGraph Workflow Design<br>• AI Agent Implementation<br>• LLM Integration<br>• Requirement Analysis<br>• Documentation & Presentation<br>• Synthetic Document Creation                                                                                                                                                                       |
+| **Sulekha Kumari**                 | • Requirement Analysis<br>• Human-in-the-Loop (HITL) Analysis<br>• Testing & Quality Assurance                                                                                                                                                                                                                                                   |
+
 ---
 
 # Business Problem
