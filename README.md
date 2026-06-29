@@ -9,6 +9,13 @@ The solution leverages multiple AI agents working collaboratively to validate he
 Designed using a microservices-based architecture, the platform integrates OCR, Large Language Models (LLMs), Retrieval-Augmented Generation, AWS cloud services, and enterprise-grade workflow orchestration to simulate a real-world insurance claim adjudication system.
 
 ---
+Team & Contributions
+
+This capstone project was successfully completed through the collaborative efforts of our team. Each member contributed to specific functional and technical areas of the solution.
+
+<img width="752" height="718" alt="image" src="https://github.com/user-attachments/assets/c9396abc-9aa1-42a6-a64a-942377a5fdd3" />
+
+---
 
 # Business Problem
 
