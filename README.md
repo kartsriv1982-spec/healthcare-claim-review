@@ -13,8 +13,6 @@ Designed using a microservices-based architecture, the platform integrates OCR, 
 
 This capstone project was successfully completed through the collaborative efforts of our team. Each member contributed to specific functional and technical areas of the solution.
 
-<img width="750" height="724" alt="image" src="https://github.com/user-attachments/assets/cf956f06-aa3c-4c28-ac37-52f3502149c2" />
-
 ## 👥 Team Contributions
 
 | **Team Member**         | **Responsibilities**                                                                                                                                                                                                                                                                                                                             |
