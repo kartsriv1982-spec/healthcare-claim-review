@@ -170,13 +170,16 @@ Claims requiring manual intervention are routed to reviewers who can:
 
 * AWS Textract
 * AWS S3
+* EC2
+* CloudFormation
+* IAM
+* VPC
 
 ## DevOps
 
 * Docker
 * Docker Compose
 * GitHub
-* Amazon EC2
 
 ---
 
